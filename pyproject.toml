@@ -1,0 +1,26 @@
+[project]
+name = "video-hub"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Shoichi Hatano", email = "shoichi117117117@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "aiofiles>=25.1.0",
+    "fastapi>=0.143.3",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.0",
+    "requests>=2.34.2",
+    "sqlalchemy>=2.1.4",
+    "uvicorn[standard]>=0.54.0",
+    "yt-dlp>=2026.8.19",
+]
+
+[project.scripts]
+video-hub = "video_hub:main"
+
+[build-system]
+requires = ["uv_build>=0.12.23,<0.13.0"]
+build-backend = "uv_build"
