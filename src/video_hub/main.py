@@ -1,16 +1,22 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
+import static_ffmpeg
+
 from video_hub.config import settings
 from video_hub.database import init_db
 from video_hub.routers import tasks
 
+
+static_ffmpeg.add_paths()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: Initialize SQLite database tables
     init_db()
     yield
-    # Shutdown: Clean up resources if needed (none required for now)
 
 app = FastAPI(
     title="Video Hub Control Plane",
@@ -19,7 +25,6 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS so your iPad browser or frontend app can talk to the backend easily
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,16 +33,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register your task management router
+# Register API routers
 app.include_router(tasks.router)
 
+# Mount the static directory to serve index.html and assets
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 @app.get("/")
-def health_check():
-    return {
-        "status": "online",
-        "service": "video-hub-control-plane",
-        "storage_footprint": "0 bytes (zero-disk streaming orchestration active)"
-    }
+def serve_frontend():
+    index_path = os.path.join(STATIC_DIR, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"status": "online", "message": "Static frontend not found"}
 
 if __name__ == "__main__":
     import uvicorn

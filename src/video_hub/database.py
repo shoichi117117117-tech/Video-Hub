@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -16,8 +16,7 @@ class VideoTask(Base):
     title = Column(String, nullable=True)
     duration = Column(Integer, nullable=True)
     poster_url = Column(String, nullable=True)
-    stream_url = Column(Text, nullable=True) # Direct extracted media URL for the iPad
-    status = Column(String, default="queued") # queued, processing, ready, completed, failed
+    status = Column(String, default="queued") # queued, processing, ready, failed
     created_at = Column(DateTime, default=datetime.utcnow)
 
 def init_db():

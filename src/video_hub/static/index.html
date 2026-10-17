@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Hub Control Plane</title>
+    <!-- Tailwind CSS CDN for utility classes -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">Video Hub Control Plane</h1>
+                <p class="text-sm text-slate-400">Zero-disk streaming orchestration for iPad</p>
+            </div>
+            <div class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-full font-medium">
+                Storage Footprint: 0 Bytes (Laptop SSD Protected)
+            </div>
+        </header>
+
+        <!-- URL Submission Form -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 mb-8 shadow-xl">
+            <label for="urlInput" class="block text-sm font-semibold mb-2 text-slate-300">Queue New YouTube Link</label>
+            <div class="flex gap-3">
+                <input 
+                    type="url" 
+                    id="urlInput" 
+                    placeholder="https://www.youtube.com/watch?v=..." 
+                    class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-indigo-500 transition-colors"
+                >
+                <button 
+                    onclick="submitTask()" 
+                    id="submitBtn"
+                    class="bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-medium px-6 py-2.5 rounded-lg text-sm transition-colors cursor-pointer"
+                >
+                    Extract & Queue
+                </button>
+            </div>
+        </div>
+
+        <!-- Task Queue List -->
+        <section>
+            <h2 class="text-lg font-semibold mb-4 text-slate-300">Ingestion Queue</h2>
+            <div id="taskList" class="grid grid-cols-1 gap-4">
+                <div class="text-slate-500 text-sm py-4 text-center">Loading queue...</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Application Logic Script -->
+    <script src="/static/app.js"></script>
+</body>
+</html>
