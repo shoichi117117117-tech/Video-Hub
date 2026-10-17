@@ -107,3 +107,48 @@ def download_and_stream_video(task_id: int, db: Session = Depends(get_db)):
         if file_path and os.path.exists(file_path):
             os.remove(file_path)
         raise HTTPException(status_code=500, detail=f"Download failed: {str(e)}")
+    
+@router.get("/batch/ready")
+def get_ready_tasks(db: Session = Depends(get_db)):
+    """
+    Returns all tasks that are currently ready to be downloaded.
+    """
+    ready_tasks = db.query(VideoTask).filter(VideoTask.status == "ready").all()
+    return [{"id": t.id, "title": t.title, "download_url": f"/api/tasks/{t.id}/download"} for t in ready_tasks]
+
+@router.delete("/clear", status_code=200)
+def clear_completed_tasks(db: Session = Depends(get_db)):
+    """
+    Clears all ready/completed tasks from the SQLite database queue 
+    once they have been processed or downloaded.
+    """
+    deleted_count = db.query(VideoTask).filter(VideoTask.status == "ready").delete()
+    db.commit()
+    return {"message": f"Successfully cleared {deleted_count} items from the queue."}
+
+@router.delete("/{task_id}", status_code=200)
+def delete_single_task(task_id: int, db: Session = Depends(get_db)):
+    """
+    Deletes a specific task from the queue database.
+    """
+    task = db.query(VideoTask).filter(VideoTask.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    db.delete(task)
+    db.commit()
+    return {"message": f"Task {task_id} deleted from queue."}
+
+
+@router.post("/{task_id}/archive", status_code=200)
+def archive_task(task_id: int, db: Session = Depends(get_db)):
+    """
+    Moves a task to the archive state instead of deleting it.
+    """
+    task = db.query(VideoTask).filter(VideoTask.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    task.status = "archived"
+    db.commit()
+    return {"message": f"Task {task_id} moved to archive."}
