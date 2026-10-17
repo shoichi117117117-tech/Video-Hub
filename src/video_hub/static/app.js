@@ -12,17 +12,20 @@ function switchTab(view) {
     const tabArchive = document.getElementById("tabArchive");
     const sectionTitle = document.getElementById("sectionTitle");
     const batchToolbar = document.getElementById("batchToolbar");
+    const archiveBatchToolbar = document.getElementById("archiveBatchToolbar");
 
     if (view === "active") {
         tabActive.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-colors bg-indigo-600 text-white shadow-sm";
         tabArchive.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-colors bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800";
         sectionTitle.textContent = "Ingestion Queue";
         batchToolbar.style.display = "flex";
+        archiveBatchToolbar.style.display = "none";
     } else {
         tabArchive.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-colors bg-indigo-600 text-white shadow-sm";
         tabActive.className = "px-4 py-2 rounded-lg text-sm font-semibold transition-colors bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800";
         sectionTitle.textContent = "Archive History";
-        batchToolbar.style.display = "none"; // Hide active batch actions in archive tab for simplicity
+        batchToolbar.style.display = "none";
+        archiveBatchToolbar.style.display = "flex";
     }
 
     fetchTasks();
@@ -47,13 +50,7 @@ async function fetchTasks() {
             return `
                 <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between hover:border-slate-700 transition-all">
                     <div class="flex gap-4 items-center w-full sm:w-auto">
-                        ${currentView === 'active' ? `
-                            ${task.status === 'ready' ? `
-                                <input type="checkbox" value="${task.id}" ${isChecked} onchange="toggleTaskSelection(${task.id}, this.checked)" class="task-checkbox w-4 h-4 accent-indigo-600 rounded bg-slate-800 border-slate-700 cursor-pointer">
-                            ` : `
-                                <input type="checkbox" disabled class="w-4 h-4 opacity-40 rounded bg-slate-800 border-slate-700">
-                            `}
-                        ` : ''}
+                        <input type="checkbox" value="${task.id}" ${isChecked} onchange="toggleTaskSelection(${task.id}, this.checked)" class="task-checkbox w-4 h-4 accent-indigo-600 rounded bg-slate-800 border-slate-700 cursor-pointer">
                         ${task.poster_url 
                             ? `<img src="${task.poster_url}" alt="Thumbnail" class="w-28 h-16 object-cover rounded-lg bg-slate-800 shrink-0">` 
                             : `<div class="w-28 h-16 bg-slate-800 rounded-lg shrink-0 flex items-center justify-center text-xs text-slate-500">No Art</div>`
@@ -79,7 +76,7 @@ async function fetchTasks() {
                             </button>
                         ` : `
                             <button onclick="unarchiveTask(${task.id})" class="bg-slate-800 hover:bg-slate-700 text-indigo-400 hover:text-indigo-300 text-xs font-medium px-3 py-2 rounded-lg transition-colors border border-slate-700">
-                                ↺ Restore to Queue
+                                ↺ Restore
                             </button>
                             <button onclick="deleteTask(${task.id})" class="bg-slate-800 hover:bg-red-900/40 hover:text-red-400 text-slate-400 text-xs font-medium px-2.5 py-2 rounded-lg transition-colors" title="Permanently delete">
                                 ✕
@@ -187,6 +184,21 @@ async function unarchiveTask(taskId) {
     } catch (err) {
         console.error("Error unarchiving task:", err);
     }
+}
+
+async function unarchiveSelected() {
+    const selectedIds = Array.from(selectedTaskIds);
+    
+    if (selectedIds.length === 0) {
+        alert("No archived tasks selected!");
+        return;
+    }
+
+    for (let i = 0; i < selectedIds.length; i++) {
+        await fetch(`${API_BASE}/${selectedIds[i]}/unarchive`, { method: "POST" });
+    }
+    selectedTaskIds.clear();
+    await fetchTasks();
 }
 
 async function deleteTask(taskId) {

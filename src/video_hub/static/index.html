@@ -58,7 +58,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                 <h2 id="sectionTitle" class="text-lg font-semibold text-slate-300">Ingestion Queue</h2>
                 
-                <!-- Batch Control Toolbar (Dynamic depending on active tab) -->
+                <!-- Active Batch Control Toolbar -->
                 <div id="batchToolbar" class="flex flex-wrap items-center gap-2 bg-slate-900/60 p-2 rounded-xl border border-slate-800">
                     <label class="flex items-center gap-2 text-xs text-slate-300 font-medium cursor-pointer px-2">
                         <input type="checkbox" onchange="toggleSelectAll(this)" class="w-4 h-4 accent-indigo-600 rounded bg-slate-800 border-slate-700">
@@ -73,6 +73,18 @@
                     </button>
                     <button onclick="archiveSelected()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors border border-slate-700" title="Move selected to archive">
                         📁 Archive Selected
+                    </button>
+                </div>
+
+                <!-- Archive Batch Control Toolbar (Hidden by default) -->
+                <div id="archiveBatchToolbar" class="hidden flex-wrap items-center gap-2 bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                    <label class="flex items-center gap-2 text-xs text-slate-300 font-medium cursor-pointer px-2">
+                        <input type="checkbox" onchange="toggleSelectAll(this)" class="w-4 h-4 accent-indigo-600 rounded bg-slate-800 border-slate-700">
+                        Select All
+                    </label>
+                    <div class="h-4 w-px bg-slate-800"></div>
+                    <button onclick="unarchiveSelected()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm">
+                        ↺ Restore Selected to Queue
                     </button>
                 </div>
             </div>
