@@ -51,7 +51,7 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
 
 @router.get("/")
 def list_tasks(db: Session = Depends(get_db)):
-    return db.query(VideoTask).order_by(VideoTask.created_at.desc()).all()
+    return db.query(VideoTask).filter(VideoTask.status != "archived").order_by(VideoTask.created_at.desc()).all()
 
 @router.get("/{task_id}/download")
 def download_and_stream_video(task_id: int, db: Session = Depends(get_db)):
@@ -152,3 +152,23 @@ def archive_task(task_id: int, db: Session = Depends(get_db)):
     task.status = "archived"
     db.commit()
     return {"message": f"Task {task_id} moved to archive."}
+
+@router.get("/archived")
+def list_archived_tasks(db: Session = Depends(get_db)):
+    """
+    Returns only archived/historical tasks.
+    """
+    return db.query(VideoTask).filter(VideoTask.status == "archived").order_by(VideoTask.created_at.desc()).all()
+
+@router.post("/{task_id}/unarchive", status_code=200)
+def unarchive_task(task_id: int, db: Session = Depends(get_db)):
+    """
+    Restores an archived task back to the active ready state.
+    """
+    task = db.query(VideoTask).filter(VideoTask.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    task.status = "ready"
+    db.commit()
+    return {"message": f"Task {task_id} restored to queue."}
